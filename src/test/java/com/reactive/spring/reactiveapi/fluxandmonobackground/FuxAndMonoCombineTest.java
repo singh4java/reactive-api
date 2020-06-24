@@ -6,20 +6,28 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
 public class FuxAndMonoCombineTest {
 
   @Test
   public void combineUsingMarge(){
+    VirtualTimeScheduler.getOrSet();
     Flux<String> flux1 = Flux.just("A", "B", "C");
     Flux<String> flux2 = Flux.just("D", "E", "F");
 
     Flux<String> merge = Flux.merge(flux1, flux2);
 
-    StepVerifier.create(merge.log())
+    StepVerifier.withVirtualTime(() -> merge.log())
         .expectSubscription()
+        .thenAwait(Duration.ofSeconds(6))
         .expectNext("A", "B", "C","D", "E", "F")
         .verifyComplete();
+
+    /*StepVerifier.create(merge.log())
+        .expectSubscription()
+        .expectNext("A", "B", "C","D", "E", "F")
+        .verifyComplete();*/
   }
 
   @Test
