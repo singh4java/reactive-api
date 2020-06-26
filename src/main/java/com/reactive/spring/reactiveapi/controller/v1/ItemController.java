@@ -52,17 +52,25 @@ public class ItemController {
     return repository.deleteById(id);
   }
 
-  @PutMapping(ITEM_END_POINT_V1+"/{id}")
+  @PutMapping(ITEM_END_POINT_V1 + "/{id}")
   public Mono<ResponseEntity<Item>> updatedIdem(@PathVariable String id,
-                                                @RequestBody Item item){
+      @RequestBody Item item) {
     return repository.findById(id)
         .flatMap(fatchItem -> {
           fatchItem.setPrice(item.getPrice());
           fatchItem.setDescription(item.getDescription());
           return repository.save(fatchItem);
         })
-        .map(item1 -> new ResponseEntity<>(item1,HttpStatus.OK))
+        .map(item1 -> new ResponseEntity<>(item1, HttpStatus.OK))
         .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
+
+  @GetMapping(ITEM_END_POINT_V1 + "/runtimeException")
+  public Flux<Item> runtimeException() {
+
+    return repository.findAll()
+        .concatWith(Mono.error(new RuntimeException("runtimeException from ItemController")));
+  }
+
 
 }
