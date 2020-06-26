@@ -122,4 +122,13 @@ public class ItemControllerTest {
         .jsonPath("$.id").isNotEmpty()
         .jsonPath("$.description").isEqualTo("Apple iPhone x");
   }
+
+  @Test
+  public void runTimeException() {
+    client.get().uri(ITEM_END_POINT_V1.concat("/runtimeException"))
+        .exchange()
+        .expectStatus().is5xxServerError()
+        .expectBody(String.class)
+        .isEqualTo("runtimeException from ItemController");
+  }
 }

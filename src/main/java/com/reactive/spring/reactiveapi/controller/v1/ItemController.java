@@ -1,8 +1,11 @@
 package com.reactive.spring.reactiveapi.controller.v1;
 
 import static com.reactive.spring.reactiveapi.constants.ItemConstants.ITEM_END_POINT_V1;
+import static com.reactive.spring.reactiveapi.constants.ItemConstants.ITEM_END_POINT_V1_STREAM;
 
 import com.reactive.spring.reactiveapi.document.Item;
+import com.reactive.spring.reactiveapi.document.ItemCapped;
+import com.reactive.spring.reactiveapi.repository.ItemReactiveCappedRepository;
 import com.reactive.spring.reactiveapi.repository.ItemReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,8 @@ public class ItemController {
 
   @Autowired
   ItemReactiveRepository repository;
+  @Autowired
+  ItemReactiveCappedRepository cappedRepository;
 
 
   @GetMapping(ITEM_END_POINT_V1)
@@ -52,17 +57,24 @@ public class ItemController {
     return repository.deleteById(id);
   }
 
-  @PutMapping(ITEM_END_POINT_V1+"/{id}")
+  @PutMapping(ITEM_END_POINT_V1 + "/{id}")
   public Mono<ResponseEntity<Item>> updatedIdem(@PathVariable String id,
-                                                @RequestBody Item item){
+      @RequestBody Item item) {
     return repository.findById(id)
         .flatMap(fatchItem -> {
           fatchItem.setPrice(item.getPrice());
           fatchItem.setDescription(item.getDescription());
           return repository.save(fatchItem);
         })
-        .map(item1 -> new ResponseEntity<>(item1,HttpStatus.OK))
+        .map(item1 -> new ResponseEntity<>(item1, HttpStatus.OK))
         .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+  }
+
+  @GetMapping(ITEM_END_POINT_V1 + "/runtimeException")
+  public Flux<Item> runtimeException() {
+
+    return repository.findAll()
+        .concatWith(Mono.error(new RuntimeException("runtimeException from ItemController")));
   }
 
 }
