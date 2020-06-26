@@ -105,7 +105,9 @@ public class ItemControllerTest {
   public void getAllItems_4() {
     client.get().uri(ITEM_END_POINT_V1.concat("/{id}"),"ABC")
         .exchange()
-        .expectStatus().isOk();
+        .expectStatus().isOk()
+        .expectBody()
+        .jsonPath("$.price",8.7);
   }
 
   @Test
