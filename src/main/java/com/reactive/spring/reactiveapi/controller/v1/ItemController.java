@@ -1,8 +1,11 @@
 package com.reactive.spring.reactiveapi.controller.v1;
 
 import static com.reactive.spring.reactiveapi.constants.ItemConstants.ITEM_END_POINT_V1;
+import static com.reactive.spring.reactiveapi.constants.ItemConstants.ITEM_END_POINT_V1_STREAM;
 
 import com.reactive.spring.reactiveapi.document.Item;
+import com.reactive.spring.reactiveapi.document.ItemCapped;
+import com.reactive.spring.reactiveapi.repository.ItemReactiveCappedRepository;
 import com.reactive.spring.reactiveapi.repository.ItemReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,8 @@ public class ItemController {
 
   @Autowired
   ItemReactiveRepository repository;
+  @Autowired
+  ItemReactiveCappedRepository cappedRepository;
 
 
   @GetMapping(ITEM_END_POINT_V1)
@@ -71,6 +76,5 @@ public class ItemController {
     return repository.findAll()
         .concatWith(Mono.error(new RuntimeException("runtimeException from ItemController")));
   }
-
 
 }
