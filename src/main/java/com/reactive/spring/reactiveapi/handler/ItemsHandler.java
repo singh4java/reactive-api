@@ -1,5 +1,8 @@
 package com.reactive.spring.reactiveapi.handler;
 
+
+
+
 import static org.springframework.web.reactive.function.BodyInserters.fromObject;
 
 import com.reactive.spring.reactiveapi.document.Item;
@@ -30,7 +33,7 @@ public class ItemsHandler {
     return itemMono.flatMap(item ->
       ServerResponse.ok()
           .contentType(MediaType.APPLICATION_JSON)
-          .body(fromObject(item))
-          .switchIfEmpty(ServerResponse.notFound().build()));
+          .body(fromObject(item)))
+          .switchIfEmpty(ServerResponse.notFound().build());
   }
 }

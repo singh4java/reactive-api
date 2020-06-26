@@ -68,4 +68,25 @@ public class ItemsHandlerTest {
 
   }
 
+  @org.junit.Test
+  public  void getOneItems() {
+    client
+        .get()
+        .uri(ITEM_END_POINT_V1_FUNCTIONAL.concat("/{id}"),"ABC")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("$.price",8.7);
+  }
+
+  @org.junit.Test
+  public  void getOneItemsNotFound() {
+    client
+        .get()
+        .uri(ITEM_END_POINT_V1_FUNCTIONAL.concat("/{id}"),"ASW")
+        .exchange()
+        .expectStatus()
+        .isNotFound();
+  }
 }
