@@ -15,12 +15,32 @@ import reactor.core.publisher.Flux;
 public class ItemDataInitializer implements CommandLineRunner {
 
 
-  @Autowired
   ItemReactiveRepository repository;
+  //MongoOperations mongoOperations;
+
+  @Autowired
+  public ItemDataInitializer(
+      ItemReactiveRepository repository
+  ) {
+    this.repository = repository;
+
+  }
 
   @Override
   public void run(String... args) throws Exception {
-    List<Item> itemList = Arrays.asList(
+    initialDataSetup();
+    //createCappedCollection();
+  }
+
+  /*private void createCappedCollection() {
+    mongoOperations.dropCollection(ItemCapped.class);
+    mongoOperations.createCollection(ItemCapped.class,
+        CollectionOptions.empty().maxDocuments(20).size(50000).capped());
+
+  }*/
+
+  public List<Item> data() {
+    return Arrays.asList(
         new Item(null, "Apple Tv", 799.7),
         new Item(null, "Apple MAC pro", 1700.7),
         new Item(null, "Apple iPad", 599.17),
@@ -28,11 +48,14 @@ public class ItemDataInitializer implements CommandLineRunner {
         new Item(null, "Apple AirLight", 5699.7),
         new Item("ABC", "Apple iSound", 8.7)
     );
+  }
+
+
+  private void initialDataSetup() {
     repository.deleteAll()
-        .thenMany(Flux.fromIterable(itemList))
+        .thenMany(Flux.fromIterable(data()))
         .flatMap(repository::save)
+        .thenMany(repository.findAll())
         .subscribe(Item::print);
-        //.thenMany(repository.findAll())
-        //.subscribe(o -> System.out.println("Mongo Data : " + o.toString()));
   }
 }
